@@ -3,6 +3,9 @@ const AWS = require('aws-sdk');
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.handler = async (event) => {
+  console.log('Received request:', JSON.stringify(event));
+  console.log(`Request type: ${event.httpMethod}`);
+  
   try {
     const productsResult = await dynamodb.scan({
       TableName: process.env.PRODUCTS_TABLE,
