@@ -6,6 +6,19 @@ provider:
   runtime: nodejs12.x
   stage: dev
   region: eu-west-1
+  iamRoleStatements:
+  - Effect: Allow
+    Action:
+      - dynamodb:*
+    Resource: "*"
+  - Effect: Allow
+    Action:
+      - lambda:InvokeFunction
+      - lambda:InvokeAsync
+      - lambda:GetFunctionConfiguration
+      - lambda:ListFunctions
+    Resource: "*"
+
 
 functions:
   getProductsList:
@@ -14,9 +27,27 @@ functions:
       - http:
           path: /products
           method: get
+    environment:
+      PRODUCTS_TABLE: ${self:custom.productsTable}
+      STOCKS_TABLE: ${self:custom.stocksTable}
   getProductsById:
     handler: handlers/getProductsById.handler
     events:
       - http:
           path: /products/{productId}
           method: get
+    environment:
+      PRODUCTS_TABLE: ${self:custom.productsTable}
+      STOCKS_TABLE: ${self:custom.stocksTable}
+  createProduct:
+    handler: handlers/createProduct.handler
+    events:
+      - http:
+          path: /products
+          method: post
+    environment:
+      PRODUCTS_TABLE: ${self:custom.productsTable}
+
+custom:
+  productsTable: "products"
+  stocksTable: "stocks"
