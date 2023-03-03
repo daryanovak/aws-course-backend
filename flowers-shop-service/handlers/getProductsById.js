@@ -4,6 +4,11 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.handler = async (event) => {
   const { productId } = event.pathParameters; // assumes productId is passed in the path
+    
+  console.log('Received request:', JSON.stringify(event));
+  console.log(`Request type: ${event.httpMethod}`);
+  console.log(`Product Id: ${body.productId}`);
+
   try {
     const productResult = await dynamodb.get({
       TableName: process.env.PRODUCTS_TABLE,

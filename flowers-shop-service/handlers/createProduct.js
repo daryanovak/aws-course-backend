@@ -4,7 +4,14 @@ const uuid = require('uuid');
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 module.exports.handler = async (event) => {
+
   const { title, description, price } = JSON.parse(event.body);
+  
+  console.log('Received request:', JSON.stringify(event));
+  console.log(`Request type: ${event.httpMethod}`);
+  console.log(`Title: ${body.title}`);
+  console.log(`Description: ${body.description}`);
+  console.log(`Price: ${body.price}`);
 
   if (!title || !description || !price) {
     return {
