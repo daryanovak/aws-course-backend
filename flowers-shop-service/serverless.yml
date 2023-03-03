@@ -1,0 +1,22 @@
+service: flowers-shop-service
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: eu-west-1
+
+functions:
+  getProductsList:
+    handler: handlers/getProductsList.handler
+    events:
+      - http:
+          path: /products
+          method: get
+  getProductsById:
+    handler: handlers/getProductsById.handler
+    events:
+      - http:
+          path: /products/{productId}
+          method: get
