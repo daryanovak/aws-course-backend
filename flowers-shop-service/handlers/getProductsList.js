@@ -5,7 +5,7 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 module.exports.handler = async (event) => {
   console.log('Received request:', JSON.stringify(event));
   console.log(`Request type: ${event.httpMethod}`);
-  
+
   try {
     const productsResult = await dynamodb.scan({
       TableName: process.env.PRODUCTS_TABLE,
@@ -19,9 +19,9 @@ module.exports.handler = async (event) => {
         '#pid': 'product_id',
         '#cnt': 'count'
       },
-      ProjectionExpression:  '#pid, #cnt',
+      ProjectionExpression: '#pid, #cnt',
     }).promise();
-    
+
 
     const combinedData = productsResult.Items.map(product => {
       const stock = stocksResult.Items.find(stock => stock.product_id === product.id);
@@ -42,15 +42,25 @@ module.exports.handler = async (event) => {
       isBase64Encoded: false,
     };
 
-    return response; 
+    return response;
   } catch (err) {
     console.log(err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        message: 'Error retrieving products from database'
-      }),
-      isBase64Encoded: false,
-    };
+    if (err.statusCode === 400) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          message: 'Bad request: missing or invalid parameters'
+        }),
+        isBase64Encoded: false,
+      };
+    } else {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          message: 'Error retrieving products from database'
+        }),
+        isBase64Encoded: false,
+      };
+    }
   }
 };
