@@ -7,7 +7,7 @@ module.exports.handler = async (event) => {
   const { name } = event.queryStringParameters;
   const params = {
     Bucket: BUCKET_NAME,
-    Key: `uploaded/${name}.csv`,
+    Key: `parsed/${name}.csv`,
     Expires: 120
   };
 

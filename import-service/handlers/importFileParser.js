@@ -14,10 +14,10 @@ module.exports.handler = async (event, context) => {
       stream.pipe(csv())
         .on('data', async (data) => {
           records.push(data);
-          console.log(data);
         })
         .on('end', async () => {
           try {
+            console.log("MY PARSED FLOWERS", records);
             await s3.copyObject({
               Bucket: record.s3.bucket.name,
               CopySource: `${record.s3.bucket.name}/${key}`,
