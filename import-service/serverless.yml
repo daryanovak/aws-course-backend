@@ -1,0 +1,45 @@
+service: import-service
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev2
+  region: eu-west-1
+
+  iamRoleStatements:
+  - Effect: Allow
+    Action:
+      - s3:PutObject
+      - s3:ListBucket
+      - s3:GetObject
+      - s3:DeleteObject
+      - s3:CopyObject
+    Resource: 
+      - arn:aws:s3:::flowers-shop-upload/*
+      - arn:aws:s3:::flowers-shop-upload/parsed/*
+      - arn:aws:s3:::flowers-shop-upload/uploaded/*
+
+functions:
+  importProductsFile:
+    handler: handlers/importProductsFile.handler
+    events:
+      - http:
+          path: /import
+          method: get
+          request:
+            parameters:
+              querystrings:
+                name: true
+                
+  importFileParser:
+    handler: handlers/importFileParser.handler
+    events:
+      - s3:
+            bucket: ${self:custom.uploadBucket}
+            event: s3:ObjectCreated:*
+            rules:
+              - prefix: uploaded/
+
+custom:
+  uploadBucket: flowers-shop-upload
