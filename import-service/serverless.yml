@@ -10,6 +10,12 @@ provider:
   iamRoleStatements:
   - Effect: Allow
     Action:
+      - dynamodb:*
+      - sqs:*
+      - sns:*
+    Resource: "*"
+  - Effect: Allow
+    Action:
       - s3:PutObject
       - s3:ListBucket
       - s3:GetObject
@@ -45,4 +51,6 @@ functions:
       SQS_QUEUE_URL:  "arn:aws:sqs:eu-west-1:416847255302:catalogItemsQueue"
       REGION: ${self:provider.region}
 custom:
-  uploadBucket: flowers-shop-upload
+  productsTable: "products"
+  stocksTable: "stocks"
+  uploadBucket: "flowers-shop-upload"

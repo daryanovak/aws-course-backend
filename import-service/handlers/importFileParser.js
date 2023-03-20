@@ -2,6 +2,7 @@ const AWS = require('aws-sdk');
 const csv = require('csv-parser');
 
 const s3 = new AWS.S3();
+const sqs = new AWS.SQS();
 
 module.exports.handler = async (event, context) => {
   const records = [];
@@ -14,6 +15,10 @@ module.exports.handler = async (event, context) => {
       stream.pipe(csv())
         .on('data', async (data) => {
           records.push(data);
+          await sqs.sendMessage({
+            QueueUrl: process.env.SQS_QUEUE_URL,
+            MessageBody: JSON.stringify(data)           
+          }).promise();
         })
         .on('end', async () => {
           try {
