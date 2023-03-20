@@ -23,10 +23,6 @@ module.exports.handler = async (event) => {
 
   try {
     console.log('Processing batch of products...');
-
-    console.log(products, "products")
-    console.log(event.Records, "HHAHHA")
-
     const putRequests = products.map((product) => ({
       PutRequest: {
         Item: {
@@ -37,8 +33,6 @@ module.exports.handler = async (event) => {
         },
       },
     }));
-
-    console.log(putRequests, "SDFGHJKGFDDFGHJKHGFDGH")
 
     await dynamoDb.batchWrite({ 
       RequestItems: {
