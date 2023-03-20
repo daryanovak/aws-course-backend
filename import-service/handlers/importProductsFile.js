@@ -15,7 +15,7 @@ module.exports.handler = async (event) => {
     const url = await s3.getSignedUrlPromise('getObject', params);
     return {
       statusCode: 200,
-      body: url,
+      body: `"${url}"`,
       headers: {
         'Access-Control-Allow-Origin': '*',
       },
