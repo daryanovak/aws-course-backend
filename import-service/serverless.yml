@@ -40,6 +40,9 @@ functions:
             event: s3:ObjectCreated:*
             rules:
               - prefix: uploaded/
-
+    environment:
+      PRODUCTS_TABLE: ${self:custom.productsTable}
+      SQS_QUEUE_URL:  "arn:aws:sqs:eu-west-1:416847255302:catalogItemsQueue"
+      REGION: ${self:provider.region}
 custom:
   uploadBucket: flowers-shop-upload
