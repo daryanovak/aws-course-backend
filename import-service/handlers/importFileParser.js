@@ -15,29 +15,31 @@ module.exports.handler = async (event, context) => {
       stream.pipe(csv())
         .on('data', async (data) => {
           records.push(data);
-          await sqs.sendMessage({
-            QueueUrl: process.env.SQS_QUEUE_URL,
-            MessageBody: JSON.stringify(data)           
-          }).promise();
         })
         .on('end', async () => {
           try {
-            console.log("MY PARSED FLOWERS", records);
-            await s3.copyObject({
-              Bucket: record.s3.bucket.name,
-              CopySource: `${record.s3.bucket.name}/${key}`,
-              Key: key.replace(/^uploaded\//, 'parsed/')
-            }).promise();
-            await s3.deleteObject({
-              Bucket: record.s3.bucket.name,
-              Key: key
-            }).promise();
+            // send each record as an SQS message
+            console.log("RECORDS FLOWERS", records)
+            for (const record of records) {
+              const params = {
+                MessageBody: JSON.stringify({
+                  id: record.id,
+                  title: record.title,
+                  description: record.description,
+                  price: record.price
+                }),
+                QueueUrl: "https://sqs.eu-west-1.amazonaws.com/416847255302/catalogItemsQueue"
+              };
+              await sqs.sendMessage(params).promise();
+            }
             resolve();
           } catch (err) {
+            console.log(err)
             reject(err);
           }
         })
         .on('error', (err) => {
+          console.log(err)
           reject(err);
         });
     });
