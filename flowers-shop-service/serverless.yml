@@ -21,6 +21,25 @@ resources:
       Properties:
         QueueName: catalogItemsQueue
         VisibilityTimeout: 3600 # Set the visibility timeout in seconds
+
+    createProductTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+        Subscription:
+          - Protocol: email
+            Endpoint: daryanovak18@gmail.com
+            FilterPolicy:
+              title:
+                - "Flower"
+              price:
+                - {"numeric": [">=", 10]}
+          - Protocol: email
+            Endpoint: artur.lamaka@gmail.com
+            FilterPolicy:
+              price:
+                - {"numeric": ["<", 10]}
+
     createProductTopic:
       Type: AWS::SNS::Topic
       Properties:
