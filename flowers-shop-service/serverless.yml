@@ -31,7 +31,7 @@ resources:
             Endpoint: daryanovak18@gmail.com
             FilterPolicy:
               title:
-                - "Flower"
+                - "VIP"
               price:
                 - {"numeric": [">=", 10]}
           - Protocol: email
