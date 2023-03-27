@@ -10,15 +10,47 @@ provider:
   - Effect: Allow
     Action:
       - dynamodb:*
-    Resource: "*"
-  - Effect: Allow
-    Action:
-      - lambda:InvokeFunction
-      - lambda:InvokeAsync
-      - lambda:GetFunctionConfiguration
-      - lambda:ListFunctions
+      - sqs:*
+      - sns:*
     Resource: "*"
 
+resources:
+  Resources:
+    catalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+        VisibilityTimeout: 3600 # Set the visibility timeout in seconds
+
+    createProductTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+        Subscription:
+          - Protocol: email
+            Endpoint: daryanovak18@gmail.com
+            FilterPolicy:
+              title:
+                - "VIP"
+              price:
+                - {"numeric": [">=", 10]}
+          - Protocol: email
+            Endpoint: artur.lamaka@gmail.com
+            FilterPolicy:
+              price:
+                - {"numeric": ["<", 10]}
+
+    createProductTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+    emailSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Protocol: email
+        TopicArn:
+          Ref: createProductTopic
+        Endpoint: daryanovak18@gmail.com
 
 functions:
   getProductsList:
@@ -47,7 +79,17 @@ functions:
           method: post
     environment:
       PRODUCTS_TABLE: ${self:custom.productsTable}
+  catalogBatchProces:
+    handler: handlers/catalogBatchProces.handler
+    events:
+      - sqs:
+          arn: "arn:aws:sqs:eu-west-1:416847255302:catalogItemsQueue"
+          batchSize: 5
+    environment:
+      PRODUCTS_TABLE: ${self:custom.productsTable}
+      SNS_TOPIC_ARN: !Ref createProductTopic
 
 custom:
   productsTable: "products"
   stocksTable: "stocks"
+  uploadBucket: "flowers-shop-upload"
